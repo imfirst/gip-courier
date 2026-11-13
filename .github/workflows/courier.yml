@@ -1,15 +1,15 @@
 name: gip-courier
 on:
   schedule:
-    - cron: '*/5 * * * *'     # GitHub запускает примерно раз в 5 минут (бывают задержки)
-  workflow_dispatch: {}       # ручной запуск кнопкой Run workflow
+    - cron: '*/20 * * * *'    # подстраховка: если курьер остановился, через ≤20 мин запустится снова
+  workflow_dispatch: {}
 concurrency:
   group: gip-courier
-  cancel-in-progress: false
+  cancel-in-progress: false   # новый запуск ждёт, пока закончится текущий
 jobs:
   courier:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 358
     steps:
       - uses: actions/checkout@v4
       - name: Run courier
@@ -17,5 +17,5 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CRM_KEY: ${{ secrets.CRM_KEY }}
           RELAY_URL: ${{ secrets.RELAY_URL }}
-          RUN_SECONDS: '270'
+          RUN_SECONDS: '20700'   # 5 ч 45 мин
         run: python3 courier.py
